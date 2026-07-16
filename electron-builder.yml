@@ -1,0 +1,52 @@
+appId: com.family.super-accounting
+productName: 家庭超级记账
+copyright: Copyright © 2026
+directories:
+  output: dist
+  buildResources: build
+asar: true
+# 用排除法：默认包含全部文件（含 node_modules 生产依赖），仅排除源码与配置文件
+# 这样 better-sqlite3、bindins 等运行时依赖会自动打包进去
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!src/**/*'
+  - '!scripts/*'
+  - '!electron/*'
+  - '!electron/**/*'
+  - '!{CLAUDE.md,README.md,CHANGELOG.md}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!{electron.vite.config.ts,electron-builder.yml}'
+  - '!{.gitignore,.npmrc,package-lock.json}'
+  - '!dist/*'
+extraMetadata:
+  main: out/main/index.js
+# 更安全的做法：确保应用能找到 better-sqlite3
+# better-sqlite3 等原生模块须从 asar 包中解包，否则无法 require 加载
+asarUnpack:
+  - '**/*.{node,dll}'
+  - '**/node_modules/better-sqlite3/**'
+  - '**/node_modules/bindings/**'
+  - '**/node_modules/file-uri-to-path/**'
+# 打包时针对当前平台重新编译原生模块
+npmRebuild: true
+buildDependenciesFromSource: false
+win:
+  target:
+    - nsis
+  artifactName: ${productName}-${version}-${arch}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: 家庭超级记账
+mac:
+  target:
+    - dmg
+  artifactName: ${productName}-${version}-${arch}.${ext}
+  category: public.app-category.finance
+dmg:
+  title: ${productName} ${version}
+  artifactName: ${productName}-${version}.${ext}
